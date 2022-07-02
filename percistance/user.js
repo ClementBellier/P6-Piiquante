@@ -1,4 +1,3 @@
-const User = require('../models/User')
 const userModel = require('../models/User')
 
 exports.saveUserInDB = async (email, password) =>{
@@ -10,7 +9,7 @@ exports.saveUserInDB = async (email, password) =>{
 }
 
 exports.findUserInDB = async (email) => {
-    return User.findOne({email})
+    return userModel.findOne({email})
         .then(user => user)
         .catch(error => error)
 }
