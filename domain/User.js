@@ -16,9 +16,9 @@ class User {
         const encryptPassword = await crypt.cryptPassword(this.password)
         if(encryptPassword.error) return new Errors(encryptPassword.error).serverError()
         this.password = encryptPassword.hash
-        const FalseOrErrorMessage = await userInDB.saveUserInDB(this.email, this.password)
-        if(!FalseOrErrorMessage) return new Success().userCreated()
-        return new Errors(FalseOrErrorMessage).badRequest()
+        const isAnErrorMessage = await userInDB.saveUserInDB(this.email, this.password)
+        if(!isAnErrorMessage) return new Success().userCreated()
+        return new Errors(isAnErrorMessage).badRequest()
         
     }
     findUser = async () => {

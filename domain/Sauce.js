@@ -16,9 +16,9 @@ class Sauce {
             userDisliked: [],
             imageUrl: imageUrl
         }
-        const FalseOrErrorMessage = await sauceInDB.saveSauceInDB(sauceToSave)
-        if(!FalseOrErrorMessage) return new Success().sauceCreated()
-        return new Errors(FalseOrErrorMessage).badRequest()
+        const isAnErrorMessage = await sauceInDB.saveSauceInDB(sauceToSave)
+        if(!isAnErrorMessage) return new Success().sauceCreated()
+        return new Errors(isAnErrorMessage).badRequest()
     }
     findAll = async () => {
         const sauces = await sauceInDB.findAllSauces()
@@ -37,9 +37,9 @@ class Sauce {
 
         const fileName = sauce.imageUrl.split('/images/')[1]
         fs.unlink(`images/${fileName}`, ()=>{})
-        const FalseOrErrorMessage = await sauceInDB.deleteSauce(sauceId)
-        if(!FalseOrErrorMessage) return new Success().sauceDeleted()
-        return new Errors(FalseOrErrorMessage).serverError()
+        const isAnErrorMessage = await sauceInDB.deleteSauce(sauceId)
+        if(!isAnErrorMessage) return new Success().sauceDeleted()
+        return new Errors(isAnErrorMessage).serverError()
     }
 }
 

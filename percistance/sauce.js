@@ -2,9 +2,9 @@ const sauceModel = require('../models/Sauce')
 
 exports.saveSauceInDB = async (sauce) => {
     const newSauce = new sauceModel({...sauce})
-    const FalseOrErrorMessage = false
+    const isAnErrorMessage = false
     return newSauce.save()
-        .then(() => FalseOrErrorMessage)
+        .then(() => isAnErrorMessage)
         .catch(error => error)
 }
 
@@ -21,8 +21,8 @@ exports.findOneSauce = async (sauceId) => {
 }
 
 exports.deleteSauce = async (sauceId) => {
-    const FalseOrErrorMessage = false
+    const isAnErrorMessage = false
     return sauceModel.deleteOne({_id: sauceId})
-     .then(()=> FalseOrErrorMessage)
+     .then(()=> isAnErrorMessage)
      .catch(error => error)
 }
