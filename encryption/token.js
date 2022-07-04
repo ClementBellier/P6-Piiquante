@@ -7,3 +7,7 @@ exports.signToken = (userId) => {
     process.env.SECRET_TOKEN,
     {expiresIn: process.env.TOKEN_EXPIRED})
 }
+
+exports.verifyToken = (token) => {
+    return jwt.verify(token, process.env.SECRET_TOKEN)
+}

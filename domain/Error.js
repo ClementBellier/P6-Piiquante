@@ -1,4 +1,4 @@
-class Error{
+class Errors{
     constructor(error){
         this.error = error
     }
@@ -16,6 +16,9 @@ class Error{
         this.error = 'Mot de pass incorrect !'
         return this.unauthorized()
     }
+    unauthorizedRequest = () => {
+        this.error = 'Requête non autorisée'
+        return this.returnError(403)}
 }
 
-module.exports = Error
+module.exports = Errors

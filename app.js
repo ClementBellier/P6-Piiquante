@@ -5,7 +5,7 @@ const path = require('path')
 const dotenv = require("dotenv");
 dotenv.config();
 
-//const saucesRoutes = require('./routes/sauces')
+const saucesRoutes = require('./routes/sauces')
 const userRoutes = require('./routes/user')
 
 mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWRD}@coursocfullstack.ciuep.mongodb.net/?retryWrites=true&w=majority`,
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
 
 app.use('/images', express.static(path.join(__dirname, 'images')))
 
-//app.use('/api/sauces', saucesRoutes)
 app.use('/api/auth', userRoutes)
+app.use('/api/sauces', saucesRoutes)
 
 module.exports = app

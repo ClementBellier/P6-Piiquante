@@ -1,7 +1,7 @@
 const crypt = require('../encryption/crypt')
-const token = require('../encryption/token')
+const tokenBuilder = require('../encryption/token')
 
-const Error = require('../domain/Error')
+const Errors = require('../domain/Error')
 const Success = require('../domain/Success')
 
 const userInDB = require('../percistance/user')
@@ -13,29 +13,31 @@ class User {
         this.userId = ""
     }
     saveUser = async () => {
-        const password = await crypt.cryptPassword(this.password)
-        if(password.error) return new Error(this.password.error).serverError()
-        this.password = password.hash
-        const isAnError = await userInDB.saveUserInDB(this.email, this.password)
-        if(!isAnError) return new Success().userCreated()
-        return new Error(isAnError).badRequest()
+        const encryptPassword = await crypt.cryptPassword(this.password)
+        if(encryptPassword.error) return new Errors(encryptPassword.error).serverError()
+        this.password = encryptPassword.hash
+        const FalseOrErrorMessage = await userInDB.saveUserInDB(this.email, this.password)
+        if(!FalseOrErrorMessage) return new Success().userCreated()
+        return new Errors(FalseOrErrorMessage).badRequest()
         
     }
     findUser = async () => {
         const isUserInDB = await userInDB.findUserInDB((this.email))
 
-        if(!isUserInDB) return new Error().userNotFound()
+        if(!isUserInDB) return new Errors().userNotFound()
 
         this.userId = isUserInDB._id
         const validPassword = await crypt.comparePassword(this.password, isUserInDB.password)
 
-        if(!validPassword) return new Error().wrongPassword()
+        if(!validPassword) return new Errors().wrongPassword()
 
-        return new Success().userFound({userId: this.userId, token: this.buildToken()})
+        const token = tokenBuilder.signToken(this.userId)
+        return new Success().userFound(this.userId, token)
     }
-    
-    buildToken = () => {
-        return token.signToken(this.userId)
+    authorize = (token) => {
+        const decodedToken = tokenBuilder.verifyToken(token)
+        if(!decodedToken) return new Errors('Requête non authentifiée !').unauthorize()
+        return {code: 200, userId: decodedToken.userId}
     }
 }
 

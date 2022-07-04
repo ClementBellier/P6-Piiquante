@@ -2,9 +2,9 @@ const userModel = require('../models/User')
 
 exports.saveUserInDB = async (email, password) =>{
     const user = new userModel({email: email,password: password})
-    const isAnError = false
+    const FalseOrErrorMessage = false
     return user.save()
-        .then(() => isAnError)
+        .then(() => FalseOrErrorMessage)
         .catch(error => error)
 }
 
