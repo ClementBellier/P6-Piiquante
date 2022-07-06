@@ -29,7 +29,7 @@ exports.deleteSauce = async (sauceId) => {
 
 exports.modifySauce = async (sauce) => {
     const isAnErrorMessage = false
-    return sauceModel.updateOne({_id: sauce._id},{...sauce})
-     .then(()=> isAnErrorMessage)
+    return sauceModel.findOneAndUpdate({_id: sauce._id},{...sauce})
+     .then(() => isAnErrorMessage)
      .catch(error => error)
 }

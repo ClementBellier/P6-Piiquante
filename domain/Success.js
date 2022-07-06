@@ -9,6 +9,7 @@ class Success{
     sauceCreated = () => this.returnSuccess(201, {message: "Sauce créée"})
     sauceModified = () => this.returnSuccess(200, {message: "Sauce modifiée"})
     sauceDeleted = () => this.returnSuccess(200, {message: "Sauce suprrimée"})
+    likeRecord = () => this.returnSuccess(200, {message: "Like ajouté à la sauce"})
     sauceFound = (sauce) => this.returnSuccess(200, sauce)
 }
 

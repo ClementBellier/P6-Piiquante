@@ -32,3 +32,7 @@ exports.deleteSauce = async (req, res, next) => {
     const response = await new Sauce().deleteSauce(sauceId, userWhoAskDelete)
     return res.status(response.code).json(response.message)
 }
+exports.likeSauce = async (req, res, next) => {
+    const response = await new Sauce().likeSauce(req.body.userId, req.body.like, req.params.id)
+    return res.status(response.code).json(response.message)
+}
