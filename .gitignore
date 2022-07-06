@@ -4,3 +4,4 @@
 
 # exclude image files but keep images folder
 images/*
+!images/.gitkeep
