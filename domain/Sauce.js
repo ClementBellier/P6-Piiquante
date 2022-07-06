@@ -7,14 +7,13 @@ const sauceInDB = require('../percistance/sauce')
 
 class Sauce {
     constructor(){}
-    createSauce = async (sauce, imageUrl) => {
+    createSauce = async (sauce) => {
         const sauceToSave = {
             ...sauce,
             likes: 0,
             dislikes: 0,
             userLiked: [],
-            userDisliked: [],
-            imageUrl: imageUrl
+            userDisliked: []
         }
         const isAnErrorMessage = await sauceInDB.saveSauceInDB(sauceToSave)
         if(!isAnErrorMessage) return new Success().sauceCreated()
@@ -40,6 +39,15 @@ class Sauce {
         const isAnErrorMessage = await sauceInDB.deleteSauce(sauceId)
         if(!isAnErrorMessage) return new Success().sauceDeleted()
         return new Errors(isAnErrorMessage).serverError()
+    }
+    modifySauce = async (sauceObject, userWhoAskModify) => {
+        const sauce = await sauceInDB.findOneSauce(sauceObject._id)
+        if(sauce.error) return new Errors(sauce.error).serverError()
+        if(sauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
+        
+        const isAnErrorMessage = await sauceInDB.modifySauce(sauceObject)
+        if(!isAnErrorMessage) return new Success().sauceDeleted()
+        return new Success().sauceModified()
     }
 }
 

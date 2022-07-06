@@ -1,3 +1,6 @@
 .env
 .lh
 /node_modules
+
+# exclude image files but keep images folder
+images/*

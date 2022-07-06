@@ -26,3 +26,10 @@ exports.deleteSauce = async (sauceId) => {
      .then(()=> isAnErrorMessage)
      .catch(error => error)
 }
+
+exports.modifySauce = async (sauce) => {
+    const isAnErrorMessage = false
+    return sauceModel.updateOne({_id: sauce._id},{...sauce})
+     .then(()=> isAnErrorMessage)
+     .catch(error => error)
+}
