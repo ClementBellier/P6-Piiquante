@@ -29,13 +29,16 @@ class Sauce {
         if(sauce.error) return new Errors(sauce.error).serverError()
         return new Success().sauceFound(sauce)
     }
+    deleteImage = sauce => {
+        const fileName = sauce.imageUrl.split('/images/')[1]
+        fs.unlink(`images/${fileName}`, ()=>{})
+    }
     deleteSauce = async (sauceId, userWhoAskDelete) => {
         const sauce = await sauceInDB.findOneSauce(sauceId)
         if(sauce.error) return new Errors(sauce.error).serverError()
         if(sauce.userId !== userWhoAskDelete) return new Errors().unauthorizedRequest()
 
-        const fileName = sauce.imageUrl.split('/images/')[1]
-        fs.unlink(`images/${fileName}`, ()=>{})
+        this.deleteImage(sauce)
         const isAnErrorMessage = await sauceInDB.deleteSauce(sauceId)
         if(!isAnErrorMessage) return new Success().sauceDeleted()
         return new Errors(isAnErrorMessage).serverError()
@@ -45,12 +48,16 @@ class Sauce {
         if(!isAnErrorMessage) return new Success().sauceModified()
         return new Errors(isAnErrorMessage).serverError()
     }
-    modifySauce = async (sauceObject, userWhoAskModify) => {
-        const sauce = await sauceInDB.findOneSauce(sauceObject._id)
-        if(sauce.error) return new Errors(sauce.error).serverError()
-        if(sauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
-        
-        return await this.updateSauce(sauceObject)
+    modifySauce = async (modifiedSauce, userWhoAskModify) => {
+        const originSauce = await sauceInDB.findOneSauce(modifiedSauce._id)
+        if(originSauce.error) return new Errors(originSauce.error).serverError()
+        if(originSauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
+
+        console.log('Origin: '+originSauce.imageUrl)
+        console.log('New: '+ modifiedSauce.imageUrl)
+
+        if(modifiedSauce.imageUrl) this.deleteImage(originSauce)
+        return await this.updateSauce(modifiedSauce)
     }
     unlike = async (userId, sauce) => {
         if(sauce.usersLiked.includes(userId)){
