@@ -52,10 +52,7 @@ class Sauce {
         const originSauce = await sauceInDB.findOneSauce(modifiedSauce._id)
         if(originSauce.error) return new Errors(originSauce.error).serverError()
         if(originSauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
-
-        console.log('Origin: '+originSauce.imageUrl)
-        console.log('New: '+ modifiedSauce.imageUrl)
-
+        
         if(modifiedSauce.imageUrl) this.deleteImage(originSauce)
         return await this.updateSauce(modifiedSauce)
     }
