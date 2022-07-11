@@ -15,9 +15,9 @@ class Sauce {
             usersLiked: [],
             usersDisliked: []
         }
-        const isAnErrorMessage = await sauceInDB.saveSauceInDB(sauceToSave)
-        if(!isAnErrorMessage) return new Success().sauceCreated()
-        return new Errors(isAnErrorMessage).badRequest()
+        const savedSauve = await sauceInDB.saveSauceInDB(sauceToSave)
+        if(savedSauve.error) return new Errors(savedSauve.error).badRequest()
+        return new Success().sauceCreated()
     }
     findAll = async () => {
         const sauces = await sauceInDB.findAllSauces()
@@ -44,9 +44,7 @@ class Sauce {
         return new Errors(isAnErrorMessage).serverError()
     }
     updateSauce = async (sauce) => {
-        const isAnErrorMessage = await sauceInDB.modifySauce(sauce)
-        if(!isAnErrorMessage) return new Success().sauceModified()
-        return new Errors(isAnErrorMessage).serverError()
+        return await sauceInDB.modifySauce(sauce)
     }
     modifySauce = async (modifiedSauce, userWhoAskModify) => {
         const originSauce = await sauceInDB.findOneSauce(modifiedSauce._id)
@@ -54,7 +52,9 @@ class Sauce {
         if(originSauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
         
         if(modifiedSauce.imageUrl) this.deleteImage(originSauce)
-        return await this.updateSauce(modifiedSauce)
+        const updatedSauce = await this.updateSauce(modifiedSauce)
+        if(updatedSauce.error) return new Errors(updatedSauce.error).serverError()
+        return new Success().sauceModified()
     }
     unlike = async (userId, sauce) => {
         if(sauce.usersLiked.includes(userId)){
@@ -65,7 +65,9 @@ class Sauce {
             sauce.usersDisliked = sauce.usersDisliked.filter(id => id !== userId)
             sauce.dislikes--
         }
-        return await this.updateSauce(sauce)
+        const unlikeSauce = await this.updateSauce(sauce)
+        if(unlikeSauce.error) return new Errors(unlikeSauce.error).serverError()
+        return new Success().unlikeRecord()
     }
 
     likeSauce = async (userId, like, sauceId) => {
@@ -81,7 +83,9 @@ class Sauce {
             sauce.dislikes ++
             sauce.usersDisliked.push(`${userId}`)
         }
-        return await this.updateSauce(sauce)
+        const likeSauce = await this.updateSauce(sauce)
+        if(likeSauce.error) return new Errors(likeSauce.error).serverError()
+        return new Success().likeRecord()
     }
 }
 
