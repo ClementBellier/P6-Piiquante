@@ -1,12 +1,15 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const app = express()
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
 const path = require('path')
-const dotenv = require("dotenv");
-dotenv.config();
+const dotenv = require('dotenv')
 
 const saucesRoutes = require('./routes/sauces')
 const userRoutes = require('./routes/user')
+
+const app = express()
+dotenv.config()
 
 mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWRD}@coursocfullstack.ciuep.mongodb.net/?retryWrites=true&w=majority`,
     { useNewUrlParser: true,
@@ -14,7 +17,9 @@ mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGOD
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
+app.use(helmet())
 app.use(express.json())
+app.use(mongoSanitize())
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');

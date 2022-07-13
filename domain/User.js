@@ -16,15 +16,15 @@ class User {
         const encryptPassword = await crypt.cryptPassword(this.password)
         if(encryptPassword.error) return new Errors(encryptPassword.error).serverError()
         this.password = encryptPassword.hash
-        const isAnErrorMessage = await userInDB.saveUserInDB(this.email, this.password)
-        if(!isAnErrorMessage) return new Success().userCreated()
-        return new Errors(isAnErrorMessage).badRequest()
-        
+        const savedUser = await userInDB.saveUserInDB(this.email, this.password)
+        if(savedUser.error) return new Errors(savedUser.error).badRequest()
+        return new Success().userCreated()        
     }
     findUser = async () => {
         const isUserInDB = await userInDB.findUserInDB((this.email))
 
         if(!isUserInDB) return new Errors().userNotFound()
+        if(isUserInDB.error) return new Errors(isUserInDB.error).serverError()
 
         this.userId = isUserInDB._id
         const validPassword = await crypt.comparePassword(this.password, isUserInDB.password)
@@ -36,7 +36,7 @@ class User {
     }
     authorize = (token) => {
         const decodedToken = tokenBuilder.verifyToken(token)
-        if(!decodedToken) return new Errors('Requête non authentifiée !').unauthorize()
+        if(!decodedToken || decodedToken.error) return new Errors('Requête non authentifiée !').unauthorized()
         return {code: 200, userId: decodedToken.userId}
     }
 }

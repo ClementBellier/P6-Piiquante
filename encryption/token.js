@@ -9,5 +9,11 @@ exports.signToken = (userId) => {
 }
 
 exports.verifyToken = (token) => {
-    return jwt.verify(token, process.env.SECRET_TOKEN)
+    try{
+        return jwt.verify(token, process.env.SECRET_TOKEN)
+    }
+    catch(error){
+        return {error}
+    }
+    
 }
