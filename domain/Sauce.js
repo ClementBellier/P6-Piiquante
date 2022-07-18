@@ -1,9 +1,9 @@
 const fs = require('fs')
 
-const Errors = require('../domain/Error')
+const ApiErrors = require('../domain/ApiErrors')
 const Success = require('../domain/Success')
 
-const sauceInDB = require('../percistance/sauce')
+const sauceInDB = require('../persistence/sauce')
 
 class Sauce {
     constructor(){}
@@ -16,17 +16,18 @@ class Sauce {
             usersDisliked: []
         }
         const savedSauve = await sauceInDB.saveSauceInDB(sauceToSave)
-        if(savedSauve.error) return new Errors(savedSauve.error).badRequest()
+        if(savedSauve.error) return new ApiErrors(savedSauve.error).badRequest()
         return new Success().sauceCreated()
     }
     findAll = async () => {
         const sauces = await sauceInDB.findAllSauces()
-        if(sauces.error) return new Errors(sauces.error).serverError()
+        if(sauces.error) return new ApiErrors(sauces.error).serverError()
         return new Success().sauceFound(sauces)
     }
     findOne = async (sauceId) => {
         const sauce = await sauceInDB.findOneSauce(sauceId)
-        if(sauce.error) return new Errors(sauce.error).serverError()
+        if(!sauce) return new ApiErrors().sauceNotFound()
+        if(sauce.error) return new ApiErrors(sauce.error).serverError()
         return new Success().sauceFound(sauce)
     }
     deleteImage = sauce => {
@@ -35,25 +36,25 @@ class Sauce {
     }
     deleteSauce = async (sauceId, userWhoAskDelete) => {
         const sauce = await sauceInDB.findOneSauce(sauceId)
-        if(sauce.error) return new Errors(sauce.error).serverError()
-        if(sauce.userId !== userWhoAskDelete) return new Errors().unauthorizedRequest()
+        if(sauce.error) return new ApiErrors(sauce.error).notFound()
+        if(sauce.userId !== userWhoAskDelete) return new ApiErrors().unauthorizedRequest()
 
         this.deleteImage(sauce)
-        const isAnErrorMessage = await sauceInDB.deleteSauce(sauceId)
-        if(!isAnErrorMessage) return new Success().sauceDeleted()
-        return new Errors(isAnErrorMessage).serverError()
+        const deletedSauce = await sauceInDB.deleteSauce(sauceId)
+        if(deletedSauce.error) return new ApiErrors(deletedSauce).serverError()
+        return new Success().sauceDeleted()        
     }
     updateSauce = async (sauce) => {
         return await sauceInDB.modifySauce(sauce)
     }
     modifySauce = async (modifiedSauce, userWhoAskModify) => {
         const originSauce = await sauceInDB.findOneSauce(modifiedSauce._id)
-        if(originSauce.error) return new Errors(originSauce.error).serverError()
-        if(originSauce.userId !== userWhoAskModify) return new Errors().unauthorizedRequest()
+        if(originSauce.error) return new ApiErrors(originSauce.error).notFound()
+        if(originSauce.userId !== userWhoAskModify) return new ApiErrors().unauthorizedRequest()
         
         if(modifiedSauce.imageUrl) this.deleteImage(originSauce)
         const updatedSauce = await this.updateSauce(modifiedSauce)
-        if(updatedSauce.error) return new Errors(updatedSauce.error).serverError()
+        if(updatedSauce.error) return new ApiErrors(updatedSauce.error).serverError()
         return new Success().sauceModified()
     }
     unlike = async (userId, sauce) => {
@@ -66,15 +67,15 @@ class Sauce {
             sauce.dislikes--
         }
         const unlikeSauce = await this.updateSauce(sauce)
-        if(unlikeSauce.error) return new Errors(unlikeSauce.error).serverError()
+        if(unlikeSauce.error) return new ApiErrors(unlikeSauce.error).serverError()
         return new Success().unlikeRecord()
     }
 
     likeSauce = async (userId, like, sauceId) => {
         const sauce = await sauceInDB.findOneSauce(sauceId)
-        if(sauce.error) return new Errors(sauce.error).serverError()
+        if(sauce.error) return new ApiErrors(sauce.error).notFound()
         if(like === 0) return await this.unlike(userId, sauce)
-        if(sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)) return new Errors("L'utilisateur a déjà voté").badRequest()
+        if(sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)) return new ApiErrors("L'utilisateur a déjà voté").badRequest()
         if(like === 1) {
             sauce.likes ++
             sauce.usersLiked.push(`${userId}`)
@@ -84,7 +85,7 @@ class Sauce {
             sauce.usersDisliked.push(`${userId}`)
         }
         const likeSauce = await this.updateSauce(sauce)
-        if(likeSauce.error) return new Errors(likeSauce.error).serverError()
+        if(likeSauce.error) return new ApiErrors(likeSauce.error).serverError()
         return new Success().likeRecord()
     }
 }

@@ -17,7 +17,7 @@ mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGOD
     .then(() => console.log('Connexion à MongoDB réussie !'))
     .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-app.use(helmet())
+app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }))
 app.use(express.json())
 app.use(mongoSanitize())
 

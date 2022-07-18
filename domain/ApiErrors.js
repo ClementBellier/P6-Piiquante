@@ -1,5 +1,6 @@
-class Errors{
+class ApiErrors extends Error{
     constructor(error){
+        super()
         this.error = error
     }
     returnError = (errorCodeHTTP) => {
@@ -8,9 +9,14 @@ class Errors{
     serverError = () => this.returnError(500)
     badRequest = () => this.returnError(400)
     unauthorized = () => this.returnError(401)
+    notFound = () => this.returnError(404)
     userNotFound = () => {
         this.error = 'Utilisateur non trouvé !'
-        return this.unauthorized()
+        return this.notFound()
+    }
+    sauceNotFound = () => {
+        this.error = 'Sauce non trouvée !'
+        return this.notFound()
     }
     wrongPassword = () => {
         this.error = 'Mot de pass incorrect !'
@@ -21,4 +27,4 @@ class Errors{
         return this.returnError(403)}
 }
 
-module.exports = Errors
+module.exports = ApiErrors
