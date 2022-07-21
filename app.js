@@ -1,6 +1,7 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 const mongoSanitize = require('express-mongo-sanitize')
 const path = require('path')
 const dotenv = require('dotenv')
@@ -11,7 +12,7 @@ const userRoutes = require('./routes/user')
 const app = express()
 dotenv.config()
 
-mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASSWRD}@coursocfullstack.ciuep.mongodb.net/?retryWrites=true&w=majority`,
+mongoose.connect(`${process.env.MONGODB_URL}`,
     { useNewUrlParser: true,
     useUnifiedTopology: true })
     .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -20,6 +21,9 @@ mongoose.connect(`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGOD
 app.use(helmet({ crossOriginResourcePolicy: { policy: "same-site" } }))
 app.use(express.json())
 app.use(mongoSanitize())
+
+//Limit each IP to 100 requests per 15 minutes
+app.use(rateLimit({windowMs: 15*60*1000, max:100, standardHeaders: true,legacyHeaders: false}))
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
