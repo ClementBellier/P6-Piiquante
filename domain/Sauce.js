@@ -16,7 +16,7 @@ class Sauce {
             usersDisliked: []
         }
         const savedSauve = await sauceInDB.saveSauceInDB(sauceToSave)
-        if(savedSauve.error) return new ApiErrors(savedSauve.error).badRequest()
+        if(savedSauve.error) return new ApiErrors(savedSauve.error).serverError()
         return new Success().sauceCreated()
     }
     findAll = async () => {
@@ -75,7 +75,7 @@ class Sauce {
         const sauce = await sauceInDB.findOneSauce(sauceId)
         if(sauce.error) return new ApiErrors(sauce.error).notFound()
         if(like === 0) return await this.unlike(userId, sauce)
-        if(sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)) return new ApiErrors("L'utilisateur a déjà voté").badRequest()
+        if(sauce.usersLiked.includes(userId) || sauce.usersDisliked.includes(userId)) return new ApiErrors("L'utilisateur-rice a déjà voté").badRequest()
         if(like === 1) {
             sauce.likes ++
             sauce.usersLiked.push(`${userId}`)

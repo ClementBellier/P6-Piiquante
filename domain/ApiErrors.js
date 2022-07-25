@@ -11,7 +11,7 @@ class ApiErrors extends Error{
     unauthorized = () => this.returnError(401)
     notFound = () => this.returnError(404)
     userNotFound = () => {
-        this.error = 'Utilisateur non trouvé !'
+        this.error = 'Utilisateur-rice non trouvé-e !'
         return this.notFound()
     }
     sauceNotFound = () => {
