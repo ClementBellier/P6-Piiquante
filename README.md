@@ -7,7 +7,7 @@ The front is developed upstream and is available in [this github repository](htt
 
 ## API Reference
 
-I made a Open Api documentation in [SwaggerHub](https://app.swaggerhub.com/apis/ClementBellier/OC_Piiquante/1.0.0#/user/loginUser)
+I made a Open Api documentation in [SwaggerHub](https://app.swaggerhub.com/apis-docs/ClementBellier/OC_Piiquante/1.0.0)
 
 
 ## Run Locally
